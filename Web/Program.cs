@@ -12,7 +12,7 @@ using Data.Contexts;
 using Data.Entities;
 using Data;
 using Hangfire;
-using Hangfire.SQLite.Core;
+using Hangfire.SQLite;
 
 namespace Web
 {
@@ -30,12 +30,17 @@ namespace Web
             CreateDbWithTestData(textContext);
 
             //List<Text> tmpList = GetAllTexts(textContext, "Traum");
-            //JobStorage.Current = new Sqlite
+            JobStorage.Current = new Hangfire.SQLite.SQLiteStorage("Data Source=hangfire.db;");
+            
             BackgroundJob.Enqueue(
                 () => Log.SeqLog.WriteNewLogMessage("Hello current time is {Time}", DateTime.Now));
 
-            
+            RecurringJob.AddOrUpdate(
+                () => Log.SeqLog.WriteNewLogMessage("This is the recurring job - Hello current time is {Time}", DateTime.Now), Cron.MinuteInterval(2));
+
             BuildWebHost(args).Run();
+
+
         }
 
         public static void CreateEmptyDb(TextContext context)

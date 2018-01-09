@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Hangfire;
 
 namespace Web.Controllers
 {
@@ -19,6 +20,8 @@ namespace Web.Controllers
         // GET: /Text/
         public IActionResult Index()
         {
+            BackgroundJob.Enqueue(
+                () => Log.SeqLog.WriteNewLogMessage("Blub - Hello current time is {Time}", DateTime.Now));
             return View();
         }
 

@@ -34,7 +34,7 @@ namespace Web
 
             // Add hangfire service.
             var options = new SQLiteStorageOptions();
-            services.AddHangfire(x => x.UseSQLiteStorage(Configuration.GetConnectionString("SQLiteHangfire"), options));
+            services.AddHangfire(x => x.UseSQLiteStorage("Data Source=hangfire.db;", options));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
