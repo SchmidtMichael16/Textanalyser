@@ -41,8 +41,11 @@ namespace Web
             // Add google authentication.
             services.AddAuthentication().AddGoogle(googleOptions =>
             {
-                googleOptions.ClientId = Configuration["Authentication:Google:ClientId"];
-                googleOptions.ClientSecret = Configuration["Authentication:Google:ClientSecret"];
+                //googleOptions.ClientId = Configuration["Authentication:Google:ClientId"];
+                //googleOptions.ClientSecret = Configuration["Authentication:Google:ClientSecret"];
+
+                googleOptions.ClientId = "856878470856-5o21npb03983diio340j1a8pfcss6sds.apps.googleusercontent.com";
+                googleOptions.ClientSecret = "k0d2QY1_mlGAaKhqWjZKLZ1z";
             });
         }
 
