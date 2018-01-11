@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Hangfire;
-using Hangfire.SQLite;
-using Hangfire.SqlServer;
+using Web.Data;
+using Web.Models;
+using Web.Services;
 
 namespace Web
 {
@@ -25,16 +26,24 @@ namespace Web
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddDbContext<ApplicationDbContext>(options =>
+                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+
+            services.AddIdentity<ApplicationUser, IdentityRole>()
+                .AddEntityFrameworkStores<ApplicationDbContext>()
+                .AddDefaultTokenProviders();
+
+            // Add application services.
+            services.AddTransient<IEmailSender, EmailSender>();
+
             services.AddMvc();
 
-            services.AddLogging(loggingBuilder => 
+            // Add google authentication.
+            services.AddAuthentication().AddGoogle(googleOptions =>
             {
-                loggingBuilder.AddSeq();
+                googleOptions.ClientId = Configuration["Authentication:Google:ClientId"];
+                googleOptions.ClientSecret = Configuration["Authentication:Google:ClientSecret"];
             });
-
-            // Add hangfire service.
-            var options = new SQLiteStorageOptions();
-            services.AddHangfire(x => x.UseSQLiteStorage("Data Source=hangfire.db;", options));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -44,6 +53,7 @@ namespace Web
             {
                 app.UseDeveloperExceptionPage();
                 app.UseBrowserLink();
+                app.UseDatabaseErrorPage();
             }
             else
             {
@@ -52,16 +62,14 @@ namespace Web
 
             app.UseStaticFiles();
 
+            app.UseAuthentication();
+
             app.UseMvc(routes =>
             {
                 routes.MapRoute(
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
-
-            // For hanfire server and dashboard
-            app.UseHangfireServer(new BackgroundJobServerOptions { WorkerCount = 1 });
-            app.UseHangfireDashboard();
         }
     }
 }
