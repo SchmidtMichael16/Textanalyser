@@ -11,6 +11,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Web.Data;
 using Web.Models;
 using Web.Services;
+using System.Globalization;
+using Microsoft.AspNetCore.Localization;
 
 namespace Web
 {
@@ -37,6 +39,9 @@ namespace Web
             services.AddTransient<IEmailSender, EmailSender>();
 
             services.AddMvc();
+            
+            // Add Localisation.
+            services.AddLocalization();
 
             // Add google authentication.
             services.AddAuthentication().AddGoogle(googleOptions =>
@@ -62,6 +67,21 @@ namespace Web
             {
                 app.UseExceptionHandler("/Home/Error");
             }
+
+            var supportedCultures = new[]
+            {
+                new CultureInfo("en-US"),
+                new CultureInfo("de-de")
+            };
+
+            app.UseRequestLocalization(new RequestLocalizationOptions
+            {
+                DefaultRequestCulture = new RequestCulture("en-US"),
+                // Formatting numbers, dates, etc.
+                SupportedCultures = supportedCultures,
+                // UI strings that we have localized.
+                SupportedUICultures = supportedCultures
+            });
 
             app.UseStaticFiles();
 
