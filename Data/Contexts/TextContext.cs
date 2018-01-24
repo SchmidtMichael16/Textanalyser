@@ -9,6 +9,9 @@ namespace Data.Contexts
     public class TextContext : DbContext
     {
         public DbSet<Text> Texts { get; set; }
+
+        public DbSet<Sentence> Sentences { get; set; }
+
         public TextContext(DbContextOptions options) : base(options)
         {
             
@@ -17,6 +20,11 @@ namespace Data.Contexts
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Text>();
+            modelBuilder.Entity<Sentence>();
+
+            modelBuilder.Entity<Sentence>()
+            .HasKey(s => new { s.ID, s.TextID });
+
             //base.OnModelCreating(modelBuilder);
         }
     }

@@ -5,19 +5,21 @@ using System.Text;
 
 namespace Data.Entities
 {
-    public class Text
+    public class Sentence
     {
-        public int ID { get; set; }
 
         [Required]
-        public string Title { get; set; }
+        [Key]
+        public int TextID { get; set; }
+
+        public int ID { get; set; }
+
+        public int NextID { get; set; }
+
+        public int PreviousID { get; set; }
 
         [Required]
         [MaxLength(15000)]
         public string Data { get; set; }
-
-        public string Author { get; set; }
-
-        public bool Processed { get; set; }
     }
 }

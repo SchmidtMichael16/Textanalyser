@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Localization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using System;
@@ -27,7 +29,7 @@ namespace Web.Controllers
 
             // return View();
 
-            string msg = "Shared resx: " + _localizer["Hello!"];
+            //string msg = "Shared resx: " + _localizer["Hello!"];
             return View();
         }
 
@@ -36,6 +38,18 @@ namespace Web.Controllers
         {
             log.LogInformation("Logging: asdfasdf");
             return View("TextCreate");
+        }
+
+        [HttpPost]
+        public IActionResult SetLanguage(string culture, string returnUrl)
+        {
+            Response.Cookies.Append(
+                CookieRequestCultureProvider.DefaultCookieName,
+                CookieRequestCultureProvider.MakeCookieValue(new RequestCulture(culture)),
+                new CookieOptions { Expires = DateTimeOffset.UtcNow.AddYears(1) }
+            );
+
+            return LocalRedirect(returnUrl);
         }
     }
 }

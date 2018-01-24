@@ -1,12 +1,13 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+
+@inject IViewLocalizer Localizer
+
 @{
-    ViewData["Title"] = "Text";
+    ViewData["Title"] = Localizer["TextHome"];
 }
 
-<h2>Willkommen!</h2>
-<p>Hier können Sie neue Texte hinzufügen oder bestehende Texte ändern/löschen!</p>
+<h2>@Localizer["Headline"]</h2>
+<p>@Localizer["Hallo"]</p>
 <div>
     <a href="Text/Add">Text hinzufügen</a> <br />
     <a href="Text/Edit">Text ändern</a> <br />

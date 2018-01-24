@@ -13,6 +13,11 @@ using Web.Models;
 using Web.Services;
 using System.Globalization;
 using Microsoft.AspNetCore.Localization;
+using Microsoft.AspNetCore.Mvc.Localization;
+using Microsoft.AspNetCore.Mvc.Razor;
+using Microsoft.Extensions.Options;
+using Hangfire;
+using Hangfire.SQLite;
 
 namespace Web
 {
@@ -28,6 +33,40 @@ namespace Web
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            // Add hangfire service.
+
+            var HangfireOptions = new SQLiteStorageOptions();
+            services.AddHangfire(x => x.UseSQLiteStorage(Configuration.GetConnectionString("SQLiteHangfire"), HangfireOptions));
+
+
+            services.AddLocalization(opts => { opts.ResourcesPath = "Resources"; });
+
+            services.AddMvc()
+                .AddViewLocalization(
+                    LanguageViewLocationExpanderFormat.Suffix,
+                    opts => { opts.ResourcesPath = "Resources"; })
+                .AddDataAnnotationsLocalization();
+
+            
+            services.Configure<RequestLocalizationOptions>(
+                opts =>
+                {
+                    var supportedCultures = new List<CultureInfo>
+                    {
+                        //new CultureInfo("en-US"),
+                        new CultureInfo("en"),
+                        //new CultureInfo("de-DE"),
+                        new CultureInfo("de")
+                    };
+
+                    opts.DefaultRequestCulture = new RequestCulture("en-US");
+                    // Formatting numbers, dates, etc.
+                    opts.SupportedCultures = supportedCultures;
+                    // UI strings that we have localized.
+                    opts.SupportedUICultures = supportedCultures;
+                });
+               
+
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
@@ -37,11 +76,6 @@ namespace Web
 
             // Add application services.
             services.AddTransient<IEmailSender, EmailSender>();
-
-            services.AddMvc();
-            
-            // Add Localisation.
-            services.AddLocalization();
 
             // Add google authentication.
             services.AddAuthentication().AddGoogle(googleOptions =>
@@ -68,22 +102,10 @@ namespace Web
                 app.UseExceptionHandler("/Home/Error");
             }
 
-            var supportedCultures = new[]
-            {
-                new CultureInfo("en-US"),
-                new CultureInfo("de-de")
-            };
-
-            app.UseRequestLocalization(new RequestLocalizationOptions
-            {
-                DefaultRequestCulture = new RequestCulture("en-US"),
-                // Formatting numbers, dates, etc.
-                SupportedCultures = supportedCultures,
-                // UI strings that we have localized.
-                SupportedUICultures = supportedCultures
-            });
-
             app.UseStaticFiles();
+
+            var options = app.ApplicationServices.GetService<IOptions<RequestLocalizationOptions>>();
+            app.UseRequestLocalization(options.Value);
 
             app.UseAuthentication();
 
@@ -93,6 +115,11 @@ namespace Web
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
+
+
+            // For hangfire server and dashboard
+            app.UseHangfireServer(new BackgroundJobServerOptions { WorkerCount = 1 });
+            app.UseHangfireDashboard();
         }
     }
 }

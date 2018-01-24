@@ -1,7 +1,15 @@
-﻿@{
+﻿
+@using Microsoft.Extensions.Localization
+@using Web.Controllers;
+
+@inject IStringLocalizer<HomeController> Localizer;
+
+@*@inject IViewLocalizer Localizer*@
+
+@{
     ViewData["Title"] = "About";
 }
-<h2>@ViewData["Title"]</h2>
+<h2>@Localizer["asdf"]</h2>
 <h3>@ViewData["Message"]</h3>
 
 <p>Use this area to provide additional information.</p>
