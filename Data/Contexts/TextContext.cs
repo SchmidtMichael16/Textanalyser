@@ -23,7 +23,7 @@ namespace Data.Contexts
             modelBuilder.Entity<Sentence>();
 
             modelBuilder.Entity<Sentence>()
-            .HasKey(s => new { s.ID, s.TextID });
+            .HasKey(s => new { s.SentenceID, s.TextID });
 
             //base.OnModelCreating(modelBuilder);
         }

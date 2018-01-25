@@ -19,5 +19,7 @@ namespace Data.Entities
         public string Author { get; set; }
 
         public bool Processed { get; set; }
+
+        public virtual List<Sentence> Sentences { get; set; }
     }
 }

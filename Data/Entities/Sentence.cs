@@ -9,14 +9,17 @@ namespace Data.Entities
     {
 
         [Required]
-        [Key]
         public int TextID { get; set; }
 
-        public int ID { get; set; }
+        public int SentenceID { get; set; }
 
         public int NextID { get; set; }
 
         public int PreviousID { get; set; }
+
+        public bool IsFirst { get; set; }
+
+        public bool IsLast { get; set; }
 
         [Required]
         [MaxLength(15000)]

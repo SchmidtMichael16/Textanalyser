@@ -9,6 +9,7 @@ using Data.DbTasks;
 using Data.Entities;
 using Hangfire;
 using Hangfire.SQLite;
+using Log;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -37,7 +38,6 @@ namespace Web
             //BackgroundJob.Enqueue(
             //   () => Log.SeqLog.WriteNewLogMessage("Hello current time is {Time}", DateTime.Now));
 
-
             // Create DB with test data.
             CreateDbWithTestData(textContext);
 
@@ -45,8 +45,16 @@ namespace Web
             //   () => BackgroundTasks.SplitNewTexts(textContext),
             //   Cron.MinuteInterval(5));
 
-            BackgroundTasks.SplitNewTexts(textContext);
             //List<Text> tmpList =  GetAllTexts(textContext, "ich");
+            //List<Text> tmpList2 = GetAllTextsToProcess(textContext);
+
+            BackgroundTasks.SplitNewTexts(textContext);
+            List<string> words = new List<string>();
+            words.Add("ich");
+            words.Add("Hallo");
+            words.Add("Heute");
+
+            BackgroundTasks.FindWorsdInTexts(textContext, words);
 
             BuildWebHost(args).Run();
         }
@@ -89,6 +97,7 @@ namespace Web
                 context.Add<Text>(FamousSpeeches.GetGorbatschowSpeedch());
                 context.Add<Text>(FamousSpeeches.GetFiglpeedch());
                 context.Add<Text>(FamousSpeeches.GetGandhiSpeedch());
+                context.Add<Text>(FamousSpeeches.GetTestText());
 
                 int rowCount = context.SaveChanges();
                 Log.SeqLog.WriteNewLogMessage("Seeding Database '{dbName}', Table '{Table}' - {rows} rows inserted", dbName, "Text", rowCount);
@@ -98,6 +107,11 @@ namespace Web
         public static List<Text> GetAllTexts(TextContext context, String title)
         {
             return context.Texts.Where(t => t.Title.Contains(title)).ToList();
+        }
+
+        public static List<Text> GetAllTextsToProcess(TextContext context)
+        {
+            return context.Texts.Where(t => t.Processed == false).ToList();
         }
 
         public static IWebHost BuildWebHost(string[] args) =>
