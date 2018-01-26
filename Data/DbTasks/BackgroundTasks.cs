@@ -1,10 +1,14 @@
 ﻿using Data.Contexts;
 using Data.Entities;
+using Data.Synonym;
 using Log;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -82,6 +86,31 @@ namespace Data.DbTasks
             words = sentence.Split().Select(x => x.Trim(punctuation)).ToList();
 
             return words;
+        }
+
+        public static Synonyms GetSynonymsFromOpenThesaurus(string searchWord)
+        {
+            // Create a request for the URL. 
+            WebRequest request = WebRequest.Create($"https://www.openthesaurus.de/synonyme/search?q={searchWord}&format=application/json");
+            // If required by the server, set the credentials.
+            request.Credentials = CredentialCache.DefaultCredentials;
+            // Get the response.
+            WebResponse response = request.GetResponse();
+            // Display the status.
+            SeqLog.WriteNewLogMessage(((HttpWebResponse)response).StatusDescription);
+            // Get the stream containing content returned by the server.
+            Stream dataStream = response.GetResponseStream();
+            // Open the stream using a StreamReader for easy access.
+            StreamReader reader = new StreamReader(dataStream);
+            // Read the content.
+            string responseFromServer = reader.ReadToEnd();
+            // Display the content.
+            SeqLog.WriteNewLogMessage(responseFromServer);
+            // Clean up the streams and the response.
+            reader.Close();
+            response.Close();
+
+            return JsonConvert.DeserializeObject<Synonyms>(responseFromServer);
         }
 
         private static List<string> SplitSentences(string sourceText)

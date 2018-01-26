@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using Data;
 using Data.Contexts;
@@ -47,6 +48,8 @@ namespace Web
 
             //List<Text> tmpList =  GetAllTexts(textContext, "ich");
             //List<Text> tmpList2 = GetAllTextsToProcess(textContext);
+
+            BackgroundTasks.GetSynonymsFromOpenThesaurus("test");
 
             BackgroundTasks.SplitNewTexts(textContext);
             List<string> words = new List<string>();
