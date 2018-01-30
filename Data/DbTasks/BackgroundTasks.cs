@@ -1,5 +1,6 @@
 ﻿using Data.Contexts;
 using Data.Entities;
+using Data.Result;
 using Data.Synonym;
 using Log;
 using Microsoft.EntityFrameworkCore;
@@ -50,7 +51,7 @@ namespace Data.DbTasks
                     {
                         newSentence.IsLast = true;
                     }
-                    
+
                     textContext.Add<Sentence>(newSentence);
                 }
 
@@ -63,19 +64,44 @@ namespace Data.DbTasks
 
         public static void FindWorsdInTexts(TextContext textContext, List<string> searchWords)
         {
-            IEnumerable<Text> allProcessedTexts = textContext.Texts.Include(s=> s.Sentences).Where(t => t.Processed == true);
+            TextResult searchResult = new TextResult();
+            SentenceResult mainSentence;
+            int exactCountMain = 0;
+
+            IEnumerable<Text> allProcessedTexts = textContext.Texts.Include(s => s.Sentences).Where(t => t.Processed == true);
+
             foreach (Text text in allProcessedTexts)
             {
-                //foreach (Sentence sentence in text.Sentences)
-                //{
-                //    List<string> words = SplitSentenceIntoWords(sentence.Data);
+                for (int i = 0; i < searchWords.Count; i++)
+                {
+                    IEnumerable<Sentence> sentences = text.Sentences.Where(s => s.Data.ToLower().Contains(searchWords[i].ToLower()));
 
-                //    for (int i = 0; i < searchWords.Count; i++)
-                //    {
-                //        // Search for exact match.
-                //        int exactCount = words.Where(w => w.ToLower() == searchWords[i]).Count();
-                //    }
-                //}
+                    foreach (Sentence sentence in sentences)
+                    {
+                        List<string> words = SplitSentenceIntoWords(sentence.Data);
+
+                        // Search for exact match in main sentence.
+                        //searchResult.MainSentences.
+                        exactCountMain += words.Where(w => w.ToLower() == searchWords[i]).Count() * 3;
+
+                        // Search for synonyms in main sentence.
+
+                        // Search for similar term in main sentence.
+                    }
+
+                    // suche nach exakten Wort im Satz 
+                    // suche nach Synonym im Satz
+
+                    // suche nach exakten Wort im vorigen Satz 
+                    // suche nach Synonym im vorigen Satz
+
+                    // suche nach exakten Wort im folgenden Satz 
+                    // suche nach Synonym im folgenden Satz
+
+                }
+
+
+
             }
         }
 

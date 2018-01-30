@@ -49,8 +49,6 @@ namespace Web
             //List<Text> tmpList =  GetAllTexts(textContext, "ich");
             //List<Text> tmpList2 = GetAllTextsToProcess(textContext);
 
-            BackgroundTasks.GetSynonymsFromOpenThesaurus("test");
-
             BackgroundTasks.SplitNewTexts(textContext);
             List<string> words = new List<string>();
             words.Add("ich");
