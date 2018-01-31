@@ -64,8 +64,7 @@ namespace Data.DbTasks
 
         public static void FindWorsdInTexts(TextContext textContext, List<string> searchWords)
         {
-            TextResult searchResult = new TextResult();
-            SentenceResult mainSentence;
+            List<TextResult> searchResult = new List<TextResult>();
             int exactCountMain = 0;
 
             IEnumerable<Text> allProcessedTexts = textContext.Texts.Include(s => s.Sentences).Where(t => t.Processed == true);
@@ -74,19 +73,26 @@ namespace Data.DbTasks
             {
                 for (int i = 0; i < searchWords.Count; i++)
                 {
+                    var pattern = new Regex(@"\W");
+                    // TODO Contains kann hier nicht verwendet werden --> findet auch "sich" wenn suchwort "ich" ist.
+                    //var q = pattern.Split(myText).Any(w => words.Contains(w));
+                    //https://stackoverflow.com/questions/4874371/how-to-check-if-any-word-in-my-liststring-contains-in-text
                     IEnumerable<Sentence> sentences = text.Sentences.Where(s => s.Data.ToLower().Contains(searchWords[i].ToLower()));
+
+                    //List<Sentence> sentencesList = text.Sentences.Where(s => s.Data.ToLower().Contains(searchWords[i].ToLower())).ToList();
 
                     foreach (Sentence sentence in sentences)
                     {
-                        List<string> words = SplitSentenceIntoWords(sentence.Data);
+                        // New main sentence.
+                        Sentence mainSentence = sentence;
 
-                        // Search for exact match in main sentence.
-                        //searchResult.MainSentences.
-                        exactCountMain += words.Where(w => w.ToLower() == searchWords[i]).Count() * 3;
+                        // Get previous Sentence.
+                        Sentence previousSentence = GetPreviousSentence(text, mainSentence);
 
-                        // Search for synonyms in main sentence.
+                        // Get previous Sentence.
+                        Sentence nextSentence = GetNextSentence(text, mainSentence);
 
-                        // Search for similar term in main sentence.
+
                     }
 
                     // suche nach exakten Wort im Satz 
@@ -114,6 +120,25 @@ namespace Data.DbTasks
             return words;
         }
 
+        private static List<string> SplitSentences(string sourceText)
+        {
+            // Delete multiple spaces.
+            sourceText = Regex.Replace(sourceText, "[ ]{2,}", " ");
+
+            // split the sentences with a regular expression
+            List<string> splitSentences = new List<string>();
+            splitSentences = Regex.Split(sourceText, @"(?<=['""A-Za-z0-9][\.\!\?])\s+(?=[A-Z])").ToList();
+
+            // loop the sentences
+            for (int i = 0; i < splitSentences.Count; i++)
+            {
+                // clean up the sentence one more time, trim it.
+                splitSentences[i] = splitSentences[i].Replace(Environment.NewLine, string.Empty);
+            }
+
+            return splitSentences;
+        }
+
         public static Synonyms GetSynonymsFromOpenThesaurus(string searchWord)
         {
             // Create a request for the URL. 
@@ -139,25 +164,48 @@ namespace Data.DbTasks
             return JsonConvert.DeserializeObject<Synonyms>(responseFromServer);
         }
 
-        private static List<string> SplitSentences(string sourceText)
+        private static Sentence GetPreviousSentence(Text text, Sentence mainSentence)
         {
-            // Delete multiple spaces.
-            sourceText = Regex.Replace(sourceText, "[ ]{2,}", " ");
-
-            // split the sentences with a regular expression
-            List<string> splitSentences = new List<string>();
-            splitSentences = Regex.Split(sourceText, @"(?<=['""A-Za-z0-9][\.\!\?])\s+(?=[A-Z])").ToList();
-
-            // loop the sentences
-            for (int i = 0; i < splitSentences.Count; i++)
+            if (mainSentence.IsFirst)
             {
-                // clean up the sentence one more time, trim it.
-                splitSentences[i] = splitSentences[i].Replace(Environment.NewLine, string.Empty);
+                return null;
             }
 
-            return splitSentences;
+            return text.Sentences.Where(s => s.SentenceID == mainSentence.PreviousID).First();
         }
 
+        private static Sentence GetNextSentence(Text text, Sentence mainSentence)
+        {
+            if (mainSentence.IsLast)
+            {
+                return null;
+            }
 
+            return text.Sentences.Where(s => s.SentenceID == mainSentence.NextID).First();
+        }
+
+        private static SentenceResult GetSentenceResult(Sentence sentence, string word)
+        {
+            SentenceResult sentenceResult = new SentenceResult(sentence.SentenceID);
+
+            List<string> words = SplitSentenceIntoWords(sentence.Data);
+
+            // Search for exact match in sentence.
+            sentenceResult.FoundedTerms.Add(new FoundedTerm(word, TermType.Exact, words.Where(w => w.ToLower() == word.ToLower()).Count()));
+
+            // Search for similiar word in sentence.
+            // TODO Levenstein-Distanz
+            return sentenceResult;
+        }
+
+        private static SentenceResult GetSentenceResult(Sentence sentence, string word, Synonyms synonyms)
+        {
+            SentenceResult sentenceResult = GetSentenceResult(sentence, word);
+
+            // Search for synonyms in sentence.
+            // TODO 
+
+            return sentenceResult;
+        }
     }
 }

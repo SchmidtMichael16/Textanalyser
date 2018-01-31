@@ -7,8 +7,9 @@ namespace Data.Result
 {
     public class TextResult
     {
-        public TextResult()
+        public TextResult(int textID)
         {
+            this.TextID = textID;
         }
 
         public int TextID { get; set; }
