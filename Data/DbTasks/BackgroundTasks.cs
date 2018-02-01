@@ -62,38 +62,50 @@ namespace Data.DbTasks
             textContext.SaveChanges();
         }
 
-        public static void FindWorsdInTexts(TextContext textContext, List<string> searchWords)
+        public static void FindWorsdInTexts(TextContext textContext, List<string> searchTerms)
         {
             List<TextResult> searchResult = new List<TextResult>();
             int exactCountMain = 0;
+            List<SearchWord> searchWords =  GetSynonymsFromOpenThesaurus(searchTerms);
 
             IEnumerable<Text> allProcessedTexts = textContext.Texts.Include(s => s.Sentences).Where(t => t.Processed == true);
-
             foreach (Text text in allProcessedTexts)
             {
-                for (int i = 0; i < searchWords.Count; i++)
+                for (int i = 0; i < searchTerms.Count; i++)
                 {
                     var pattern = new Regex(@"\W");
                     // TODO Contains kann hier nicht verwendet werden --> findet auch "sich" wenn suchwort "ich" ist.
                     //var q = pattern.Split(myText).Any(w => words.Contains(w));
                     //https://stackoverflow.com/questions/4874371/how-to-check-if-any-word-in-my-liststring-contains-in-text
-                    IEnumerable<Sentence> sentences = text.Sentences.Where(s => s.Data.ToLower().Contains(searchWords[i].ToLower()));
+                    //IEnumerable<Sentence> sentences = text.Sentences.Where(s => s.Data.ToLower().Contains(searchWords[i].ToLower()));
 
-                    //List<Sentence> sentencesList = text.Sentences.Where(s => s.Data.ToLower().Contains(searchWords[i].ToLower())).ToList();
+                    //List<Sentence> sentencesListOld = text.Sentences.Where(s => s.Data.ToLower().Contains(searchWords[i].ToLower())).ToList();
+                    List<Sentence> sentencesList = text.Sentences.Where(s => SplitSentenceIntoWords(s.Data).Where(w => 
+                        w.ToLower() == searchTerms[i].ToLower().ToLower() ||
+                        Fastenshtein.Levenshtein.Distance(w.ToLower(), searchTerms[i].ToLower()) == 1
+                        ).Count()> 0).ToList();
 
-                    foreach (Sentence sentence in sentences)
-                    {
-                        // New main sentence.
-                        Sentence mainSentence = sentence;
+                    /*
+                    int tmp = Fastenshtein.Levenshtein.Distance("mich", "sich");
+                    
+                    PrintSentenceList(sentencesList);
+                    PrintSentenceList(sentencesList2);
+                    */
 
-                        // Get previous Sentence.
-                        Sentence previousSentence = GetPreviousSentence(text, mainSentence);
+                    Console.WriteLine("hier");
+                    //foreach (Sentence sentence in sentences)
+                    //{
+                    //    // New main sentence.
+                    //    Sentence mainSentence = sentence;
 
-                        // Get previous Sentence.
-                        Sentence nextSentence = GetNextSentence(text, mainSentence);
+                    //    // Get previous Sentence.
+                    //    Sentence previousSentence = GetPreviousSentence(text, mainSentence);
+
+                    //    // Get previous Sentence.
+                    //    Sentence nextSentence = GetNextSentence(text, mainSentence);
 
 
-                    }
+                    //}
 
                     // suche nach exakten Wort im Satz 
                     // suche nach Synonym im Satz
@@ -164,6 +176,18 @@ namespace Data.DbTasks
             return JsonConvert.DeserializeObject<Synonyms>(responseFromServer);
         }
 
+        public static List<SearchWord> GetSynonymsFromOpenThesaurus(List<string> words)
+        {
+            List<SearchWord> searchWords = new List<SearchWord>();
+
+            for (int i = 0; i < words.Count; i++)
+            {
+                searchWords.Add(new SearchWord(words[i], GetSynonymsFromOpenThesaurus(words[i]).Synsets));
+            }
+
+            return searchWords;
+        }
+
         private static Sentence GetPreviousSentence(Text text, Sentence mainSentence)
         {
             if (mainSentence.IsFirst)
@@ -206,6 +230,14 @@ namespace Data.DbTasks
             // TODO 
 
             return sentenceResult;
+        }
+
+        private static void PrintSentenceList(List<Sentence> list)
+        {
+            for (int i = 0; i<list.Count;i++)
+            {
+                Log.SeqLog.WriteNewLogMessage($"#{i}  - {list[i].ToString()}");
+            }
         }
     }
 }

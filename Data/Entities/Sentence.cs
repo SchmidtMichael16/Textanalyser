@@ -24,5 +24,12 @@ namespace Data.Entities
         [Required]
         [MaxLength(15000)]
         public string Data { get; set; }
+
+        public override string ToString()
+        {
+            return $"TID-{this.TextID}  -  SID-{this.SentenceID}  -  {this.Data}"; 
+        }
+        
+        
     }
 }
