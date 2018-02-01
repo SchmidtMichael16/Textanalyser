@@ -66,24 +66,43 @@ namespace Data.DbTasks
         {
             List<TextResult> searchResult = new List<TextResult>();
             int exactCountMain = 0;
-            List<SearchWord> searchWords =  GetSynonymsFromOpenThesaurus(searchTerms);
+            List<SearchWord> searchWords = GetSynonymsFromOpenThesaurus(searchTerms);
+
+            foreach (SearchWord searchword in searchWords)
+            {
+                searchword.CleanUpSynonyms();
+            }
 
             IEnumerable<Text> allProcessedTexts = textContext.Texts.Include(s => s.Sentences).Where(t => t.Processed == true);
             foreach (Text text in allProcessedTexts)
             {
-                for (int i = 0; i < searchTerms.Count; i++)
+                for (int i = 0; i < searchWords.Count; i++)
                 {
-                    var pattern = new Regex(@"\W");
-                    // TODO Contains kann hier nicht verwendet werden --> findet auch "sich" wenn suchwort "ich" ist.
-                    //var q = pattern.Split(myText).Any(w => words.Contains(w));
-                    //https://stackoverflow.com/questions/4874371/how-to-check-if-any-word-in-my-liststring-contains-in-text
-                    //IEnumerable<Sentence> sentences = text.Sentences.Where(s => s.Data.ToLower().Contains(searchWords[i].ToLower()));
+                    // Get all sentences of a Text that contains the exatct, similar or synoym word.
+                    List<Sentence> sentencesList = text.Sentences.Where(s => s.SplitSentenceIntoWords().Where(w =>
+                        w.ToLower() == searchWords[i].Term.ToLower().ToLower() ||
+                        Fastenshtein.Levenshtein.Distance(w.ToLower(), searchWords[i].Term.ToLower()) == 1 ||
+                        CheckIfWordISynonyms(w, searchWords[i])
+                        ).Count() > 0).ToList();
 
-                    //List<Sentence> sentencesListOld = text.Sentences.Where(s => s.Data.ToLower().Contains(searchWords[i].ToLower())).ToList();
-                    List<Sentence> sentencesList = text.Sentences.Where(s => SplitSentenceIntoWords(s.Data).Where(w => 
-                        w.ToLower() == searchTerms[i].ToLower().ToLower() ||
-                        Fastenshtein.Levenshtein.Distance(w.ToLower(), searchTerms[i].ToLower()) == 1
-                        ).Count()> 0).ToList();
+
+                    if (sentencesList.Count > 0)
+                    {
+                        TextResult textResult = new TextResult(text.ID);
+
+                        foreach (Sentence sentence in sentencesList)
+                        {
+                            SentenceResult sentenceResult = new SentenceResult(sentence.SentenceID, 3, 2, 1);
+                            sentenceResult.MainSentence = sentence;
+                            sentenceResult.PreviousSentence = GetPreviousSentence(text, sentence);
+                            sentenceResult.NextSentence = GetNextSentence(text, sentence);
+                            sentenceResult.CalculateResult(searchWords, true);
+                            sentenceResult.CalculateTotalScore();
+                            // textResult.Sentences.Add(sentenceResult);
+                            Console.WriteLine("hier");
+                        }
+                    }
+
 
                     /*
                     int tmp = Fastenshtein.Levenshtein.Distance("mich", "sich");
@@ -92,7 +111,7 @@ namespace Data.DbTasks
                     PrintSentenceList(sentencesList2);
                     */
 
-                    Console.WriteLine("hier");
+                    
                     //foreach (Sentence sentence in sentences)
                     //{
                     //    // New main sentence.
@@ -123,14 +142,7 @@ namespace Data.DbTasks
             }
         }
 
-        public static List<string> SplitSentenceIntoWords(string sentence)
-        {
-            List<string> words = new List<string>();
-            char[] punctuation = sentence.Where(Char.IsPunctuation).Distinct().ToArray();
-            words = sentence.Split().Select(x => x.Trim(punctuation)).ToList();
 
-            return words;
-        }
 
         private static List<string> SplitSentences(string sourceText)
         {
@@ -208,36 +220,29 @@ namespace Data.DbTasks
             return text.Sentences.Where(s => s.SentenceID == mainSentence.NextID).First();
         }
 
-        private static SentenceResult GetSentenceResult(Sentence sentence, string word)
-        {
-            SentenceResult sentenceResult = new SentenceResult(sentence.SentenceID);
-
-            List<string> words = SplitSentenceIntoWords(sentence.Data);
-
-            // Search for exact match in sentence.
-            sentenceResult.FoundedTerms.Add(new FoundedTerm(word, TermType.Exact, words.Where(w => w.ToLower() == word.ToLower()).Count()));
-
-            // Search for similiar word in sentence.
-            // TODO Levenstein-Distanz
-            return sentenceResult;
-        }
-
-        private static SentenceResult GetSentenceResult(Sentence sentence, string word, Synonyms synonyms)
-        {
-            SentenceResult sentenceResult = GetSentenceResult(sentence, word);
-
-            // Search for synonyms in sentence.
-            // TODO 
-
-            return sentenceResult;
-        }
-
         private static void PrintSentenceList(List<Sentence> list)
         {
-            for (int i = 0; i<list.Count;i++)
+            for (int i = 0; i < list.Count; i++)
             {
                 Log.SeqLog.WriteNewLogMessage($"#{i}  - {list[i].ToString()}");
             }
+        }
+
+        public static bool CheckIfWordISynonyms(string word, SearchWord searchWords)
+        {
+            foreach (SynonymSet synonmset in searchWords.Synonyms)
+            {
+                foreach (SynonymTerm synonymTerm in synonmset.Terms)
+                {
+                    if (word.ToLower() == synonymTerm.Term.ToLower())
+                    {
+                        return true;
+                    }
+                }
+
+            }
+
+            return false;
         }
     }
 }

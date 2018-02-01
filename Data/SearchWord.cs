@@ -15,5 +15,26 @@ namespace Data
         public string Term { get; set; }
 
         public List<SynonymSet> Synonyms { get; set; }
+
+        public void CleanUpSynonyms()
+        {
+            for (int i = 0; i < this.Synonyms.Count; i++)
+            {
+                for (int j = 0; j<this.Synonyms[i].Terms.Count;j++)
+                {
+                    if (this.Synonyms[i].Terms[j].Term.ToLower() == this.Term.ToLower())
+                    {
+                        this.Synonyms[i].Terms.RemoveAt(j);
+                        j--;
+                    }
+                }
+                
+            }
+        }
+
+        public override string ToString()
+        {
+            return $"{this.Term}";
+        }
     }
 }

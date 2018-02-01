@@ -18,38 +18,35 @@ namespace Data.Result
         {
             get
             {
-                int totalScore = 0;
+                //int totalScore = 0;
 
-                if (this.MainSentences != null)
-                {
-                    totalScore += this.MainSentences.Score;
-                }
+                //if (this.MainSentences != null)
+                //{
+                //    totalScore += this.MainSentences.Score;
+                //}
 
-                if (this.NextSentences != null)
-                {
-                    totalScore += this.NextSentences.Score;
-                }
+                //if (this.NextSentences != null)
+                //{
+                //    totalScore += this.NextSentences.Score;
+                //}
 
-                if (this.PreviousSentences != null)
-                {
-                    totalScore += this.PreviousSentences.Score;
-                }
+                //if (this.PreviousSentences != null)
+                //{
+                //    totalScore += this.PreviousSentences.Score;
+                //}
 
-                return totalScore;
+                //return totalScore;
+                return 0;
             }
         }
 
 
-        public SentenceResult MainSentences
+        public List<SentenceResult>Sentences
         {
             get;
 
             set;
         }
-
-        public SentenceResult NextSentences { get; set; }
-
-        public SentenceResult PreviousSentences { get; set; }
 
     }
 }

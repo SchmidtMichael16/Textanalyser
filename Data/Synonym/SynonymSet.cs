@@ -12,5 +12,7 @@ namespace Data
         public List<Object> Categories { get; set; }
 
         public List<SynonymTerm> Terms { get; set; }
+
+
     }
 }

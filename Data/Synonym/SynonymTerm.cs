@@ -17,7 +17,8 @@ namespace Data.Synonym
             set
             {
                 //https://stackoverflow.com/questions/20505914/escape-special-character-in-regex
-                Regex rgx = new Regex(Regex.Escape("(") + ".*)");
+                Regex rgx = new Regex(Regex.Escape("(") + ".*" + Regex.Escape(")"));
+                //Regex rgx = new Regex("(.*)");
                 this.term = rgx.Replace(value,"").Trim();
                 //this.term = value.Replace()
                    

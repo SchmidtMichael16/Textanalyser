@@ -6,8 +6,9 @@ namespace Data.Result
 {
     public class FoundedTerm
     {
-        public FoundedTerm(string term, TermType termType, int amount)
+        public FoundedTerm(SenteneType senteneType, TermType termType, string term,  int amount)
         {
+            this.SenteneType = senteneType;
             this.Term = term;
             this.TermType = termType;
             this.Amount = amount;
@@ -17,6 +18,13 @@ namespace Data.Result
 
         public TermType TermType { get; set; }
 
+        public SenteneType SenteneType { get; set; }
+
         public int Amount { get; set; }
+
+        public override string ToString()
+        {
+            return $"{this.SenteneType} - {this.TermType} - {this.Term} - {this.Amount}";
+        }
     }
 }

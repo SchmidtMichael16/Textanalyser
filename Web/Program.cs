@@ -87,17 +87,17 @@ namespace Web
             if (!context.Texts.Any())
             {
                 Log.SeqLog.WriteNewLogMessage("Seeding Database '{dbName}', Table '{Table}'...", dbName, "Text");
-                context.Add<Text>(FamousSpeeches.GetChurchillSpeedch1());
-                context.Add<Text>(FamousSpeeches.GetChurchillSpeedch2());
-                context.Add<Text>(FamousSpeeches.GetKennedySpeech());
-                context.Add<Text>(FamousSpeeches.GetMandelaSpeedch());
-                context.Add<Text>(FamousSpeeches.GetJobsSpeedch1());
-                context.Add<Text>(FamousSpeeches.GetJobsSpeedch2());
-                context.Add<Text>(FamousSpeeches.GetMLutherKingSpeech());
-                context.Add<Text>(FamousSpeeches.GetObamaSpeedch());
-                context.Add<Text>(FamousSpeeches.GetGorbatschowSpeedch());
-                context.Add<Text>(FamousSpeeches.GetFiglpeedch());
-                context.Add<Text>(FamousSpeeches.GetGandhiSpeedch());
+                //context.Add<Text>(FamousSpeeches.GetChurchillSpeedch1());
+                //context.Add<Text>(FamousSpeeches.GetChurchillSpeedch2());
+                //context.Add<Text>(FamousSpeeches.GetKennedySpeech());
+                //context.Add<Text>(FamousSpeeches.GetMandelaSpeedch());
+                //context.Add<Text>(FamousSpeeches.GetJobsSpeedch1());
+                //context.Add<Text>(FamousSpeeches.GetJobsSpeedch2());
+                //context.Add<Text>(FamousSpeeches.GetMLutherKingSpeech());
+                //context.Add<Text>(FamousSpeeches.GetObamaSpeedch());
+                //context.Add<Text>(FamousSpeeches.GetGorbatschowSpeedch());
+                //context.Add<Text>(FamousSpeeches.GetFiglpeedch());
+                //context.Add<Text>(FamousSpeeches.GetGandhiSpeedch());
                 context.Add<Text>(FamousSpeeches.GetTestText());
 
                 int rowCount = context.SaveChanges();

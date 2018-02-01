@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Data.Entities
 {
@@ -24,6 +26,15 @@ namespace Data.Entities
         [Required]
         [MaxLength(15000)]
         public string Data { get; set; }
+
+        public  List<string> SplitSentenceIntoWords()
+        {
+            List<string> words = new List<string>();
+            char[] punctuation = this.Data.Where(Char.IsPunctuation).Distinct().ToArray();
+            words = this.Data.Split().Select(x => x.Trim(punctuation)).ToList();
+
+            return words;
+        }
 
         public override string ToString()
         {
