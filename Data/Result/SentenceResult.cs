@@ -106,6 +106,7 @@ namespace Data.Result
 
         private void GetSentenceResult(Sentence sentence, List<SearchWord> searchWords, SenteneType sentenceType, bool alsoSynonyms)
         {
+            List<string> foundedWords = new List<string>();
             List<string> words = sentence.SplitSentenceIntoWords();
 
             foreach (SearchWord searchWord in searchWords)
@@ -120,20 +121,30 @@ namespace Data.Result
                 }
 
                 // Search for similiar word in sentence.
-                count = words.Where(w => Fastenshtein.Levenshtein.Distance(w.ToLower(), searchWord.Term.ToLower()) == 1).Count();
-                if (count > 0)
-                {
-                    this.FoundedTerms.Add(new FoundedTerm(sentenceType, TermType.Similar, searchWord.Term, count));
-                }
+                foundedWords = words.Where(w => Fastenshtein.Levenshtein.Distance(w.ToLower(), searchWord.Term.ToLower()) == 1).ToList();
+                this.AddHitsToFoundedTerms(foundedWords, sentenceType, TermType.Synonym);
 
                 // Search for synonyms in sentence.
                 if (alsoSynonyms)
                 {
-                    count = words.Where(w => BackgroundTasks.CheckIfWordISynonyms(w, searchWord)).Count();
-                    if (count > 0)
-                    {
-                        this.FoundedTerms.Add(new FoundedTerm(sentenceType, TermType.Synonym, searchWord.Term, count));
-                    }
+                    foundedWords = new List<string>();
+                    foundedWords = words.Where(w => BackgroundTasks.CheckIfWordISynonyms(w, searchWord)).ToList();
+                    this.AddHitsToFoundedTerms(foundedWords, sentenceType, TermType.Synonym);
+                }
+            }
+        }
+
+        private void AddHitsToFoundedTerms (List<string> foundedWords, SenteneType sentenceType, TermType termType)
+        {
+            if (foundedWords.Count > 0)
+            {
+                var numberGroups = foundedWords.GroupBy(w => w.ToLower());
+                foreach (var grp in numberGroups)
+                {
+                    var foundedTerm = grp.Key;
+                    var total = grp.Count();
+
+                    this.FoundedTerms.Add(new FoundedTerm(sentenceType, termType, foundedTerm, total));
                 }
             }
         }

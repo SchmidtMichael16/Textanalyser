@@ -1,0 +1,49 @@
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@using Web
+
+@inject IHtmlLocalizer<SharedResources> SharedLocalizer
+@inject IViewLocalizer Localizer
+@model Web.Models.SearchViewModel
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h2>Index</h2>
+
+<h4>SearchViewModel</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Index">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Word1" class="control-label">1. @SharedLocalizer["Word"]</label>
+                <input asp-for="Word1" class="form-control" />
+                <span asp-validation-for="Word1" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Word2" class="control-label">2. @SharedLocalizer["Word"]</label>
+                <input asp-for="Word2" class="form-control" />
+                <span asp-validation-for="Word2" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Word3" class="control-label">3. @SharedLocalizer["Word"]</label>
+                <input asp-for="Word3" class="form-control" />
+                <span asp-validation-for="Word3" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <div class="checkbox">
+                    <label>
+                        <input asp-for="AlsoSynonyms" /> @Localizer["alsoSynonyms"]
+                    </label>
+                </div>
+            </div>
+            <div class="form-group">
+                <input type="submit" value=@SharedLocalizer["Search"] class="btn btn-default" />
+            </div>
+        </form>
+    </div>
+</div>
+
+

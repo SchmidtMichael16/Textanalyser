@@ -62,7 +62,7 @@ namespace Data.DbTasks
             textContext.SaveChanges();
         }
 
-        public static void FindWorsdInTexts(TextContext textContext, List<string> searchTerms)
+        public static List<TextResult> FindWorsdInTexts(TextContext textContext, List<string> searchTerms, bool alsoSynonyms)
         {
             List<TextResult> searchResult = new List<TextResult>();
             int exactCountMain = 0;
@@ -96,11 +96,15 @@ namespace Data.DbTasks
                             sentenceResult.MainSentence = sentence;
                             sentenceResult.PreviousSentence = GetPreviousSentence(text, sentence);
                             sentenceResult.NextSentence = GetNextSentence(text, sentence);
-                            sentenceResult.CalculateResult(searchWords, true);
+                            sentenceResult.CalculateResult(searchWords, alsoSynonyms);
                             sentenceResult.CalculateTotalScore();
                             // textResult.Sentences.Add(sentenceResult);
                             Console.WriteLine("hier");
+
+                            textResult.Sentences.Add(sentenceResult);
                         }
+
+                        searchResult.Add(textResult);
                     }
 
 
@@ -111,7 +115,7 @@ namespace Data.DbTasks
                     PrintSentenceList(sentencesList2);
                     */
 
-                    
+
                     //foreach (Sentence sentence in sentences)
                     //{
                     //    // New main sentence.
@@ -136,10 +140,9 @@ namespace Data.DbTasks
                     // suche nach Synonym im folgenden Satz
 
                 }
-
-
-
             }
+
+            return searchResult;
         }
 
 

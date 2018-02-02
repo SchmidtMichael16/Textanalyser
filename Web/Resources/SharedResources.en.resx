@@ -132,4 +132,13 @@
   <data name="Register" xml:space="preserve">
     <value>Register</value>
   </data>
+  <data name="Search" xml:space="preserve">
+    <value>Search</value>
+  </data>
+  <data name="Search also for Synonyms" xml:space="preserve">
+    <value>Search also for Synonyms</value>
+  </data>
+  <data name="Word" xml:space="preserve">
+    <value>Word</value>
+  </data>
 </root>

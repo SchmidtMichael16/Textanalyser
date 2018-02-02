@@ -241,7 +241,7 @@ namespace Data
 
         public static Text GetTestText()
         {
-            return new Text() { Author = "Admin", Title = "Test Text", Data = @"Das ist ein Test.  Das ist ein Test. Das ist ein Test! Das ist ein Test? Icke habe fertig. Ein satz mit ich. Selbst hätte ich das nicht geschafft." };
+            return new Text() { Author = "Admin", Title = "Test Text", Data = @"Das ist ein Test.  Das ist ein Test. Das ist ein Test! Das ist ein Test? Hier sollte mich Mich nich anschlagen mich. Icke habe fertig. Ein satz mit ich. Selbst hätte ich das nicht geschafft." };
         }
     }
 }

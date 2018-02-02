@@ -55,7 +55,7 @@ namespace Web
             words.Add("Hallo");
             words.Add("Heute");
 
-            BackgroundTasks.FindWorsdInTexts(textContext, words);
+            //BackgroundTasks.FindWorsdInTexts(textContext, words, true);
 
             BuildWebHost(args).Run();
         }
