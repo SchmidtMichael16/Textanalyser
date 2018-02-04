@@ -117,7 +117,7 @@ namespace Data.Result
                 count = words.Where(w => w.ToLower() == searchWord.Term.ToLower()).Count();
                 if (count > 0)
                 {
-                    this.FoundedTerms.Add(new FoundedTerm(sentenceType, TermType.Exact, searchWord.Term, count));
+                    this.FoundedTerms.Add(new FoundedTerm(sentenceType, TermType.Exact, searchWord.Term, count, 3, 2, 1));
                 }
 
                 // Search for similiar word in sentence.
@@ -134,7 +134,7 @@ namespace Data.Result
             }
         }
 
-        private void AddHitsToFoundedTerms (List<string> foundedWords, SenteneType sentenceType, TermType termType)
+        private void AddHitsToFoundedTerms(List<string> foundedWords, SenteneType sentenceType, TermType termType)
         {
             if (foundedWords.Count > 0)
             {
@@ -144,7 +144,7 @@ namespace Data.Result
                     var foundedTerm = grp.Key;
                     var total = grp.Count();
 
-                    this.FoundedTerms.Add(new FoundedTerm(sentenceType, termType, foundedTerm, total));
+                    this.FoundedTerms.Add(new FoundedTerm(sentenceType, termType, foundedTerm, total, 3, 2, 1));
                 }
             }
         }

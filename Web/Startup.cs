@@ -18,6 +18,7 @@ using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.Extensions.Options;
 using Hangfire;
 using Hangfire.SQLite;
+using Data.Contexts;
 
 namespace Web
 {
@@ -34,10 +35,11 @@ namespace Web
         public void ConfigureServices(IServiceCollection services)
         {
             // Add hangfire service.
-
             var HangfireOptions = new SQLiteStorageOptions();
             services.AddHangfire(x => x.UseSQLiteStorage(Configuration.GetConnectionString("SQLiteHangfire"), HangfireOptions));
 
+            // Add SignalR
+            services.AddSignalR();
 
             services.AddLocalization(opts => { opts.ResourcesPath = "Resources"; });
 
@@ -47,7 +49,10 @@ namespace Web
                     opts => { opts.ResourcesPath = "Resources"; })
                 .AddDataAnnotationsLocalization();
 
-            
+            var dbBuilder = new DbContextOptionsBuilder<TextContext>();
+            dbBuilder.UseSqlite("Data Source=" + Configuration.GetConnectionString("SQLiteTextDb"));
+            services.AddScoped<TextContext>(_ => new TextContext(dbBuilder.Options));
+
             services.Configure<RequestLocalizationOptions>(
                 opts =>
                 {
@@ -109,6 +114,13 @@ namespace Web
 
             app.UseAuthentication();
 
+            // For SignalR
+            app.UseSignalR(routes =>
+            {
+                routes.MapHub<SearchHub>("search");
+            });
+
+            // For MVC
             app.UseMvc(routes =>
             {
                 routes.MapRoute(
@@ -120,6 +132,8 @@ namespace Web
             // For hangfire server and dashboard
             app.UseHangfireServer(new BackgroundJobServerOptions { WorkerCount = 1 });
             app.UseHangfireDashboard();
+
+
         }
     }
 }

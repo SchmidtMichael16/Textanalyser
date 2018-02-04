@@ -1,6 +1,9 @@
 ﻿@using Microsoft.AspNetCore.Mvc.Localization
 @using Web
 
+
+@model Web.Models.SearchViewModel
+
 @inject IHtmlLocalizer<SharedResources> SharedLocalizer
 @inject IViewLocalizer Localizer
 
@@ -14,22 +17,125 @@
 </div>
 <div>@SharedLocalizer["Add"] - Hier sollte es gehen</div>
 <br />
-<div>
-    <table>
-        <tbody>
-            <tr>
-                <td>@*<img src="~/images/Icons/add-documents.png" width="32" height="32"/>*@</td>
-                <td><a href="Home/Add">Text hinzufügen</a></td>
-            </tr>
-            <tr>
-                <td></td>
-                <td><a href="Home/Edit">Text ändern</a></td>
-            </tr>
-            <tr>
-                <td></td>
-                <td><a href="Home/Delete">Text löschen</a></td>
-            </tr>
-        </tbody>
-    </table>
+
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form id="SearchForm" asp-action="../api/search/" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Word1" class="control-label">1. @SharedLocalizer["Word"]</label>
+                <input asp-for="Word1" class="form-control" />
+                <span asp-validation-for="Word1" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Word2" class="control-label">2. @SharedLocalizer["Word"]</label>
+                <input asp-for="Word2" class="form-control" />
+                <span asp-validation-for="Word2" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Word3" class="control-label">3. @SharedLocalizer["Word"]</label>
+                <input asp-for="Word3" class="form-control" />
+                <span asp-validation-for="Word3" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <div class="checkbox">
+                    <label>
+                        <input asp-for="AlsoSynonyms" /> @Localizer["alsoSynonyms"]
+                    </label>
+                </div>
+            </div>
+            @*<div class="form-group">
+                <input type="submit" id="search" value=@SharedLocalizer["Search"] onclick="SearchWords()" class="btn btn-default" />
+            </div>*@
+        </form>
+    </div>
 </div>
+<button type="button" class="btn btn-default" onclick="SearchWords()">@SharedLocalizer["Search"]</button>
+<hr />
+
+<div>
+    <ul id="Results"></ul>
+</div>
+
+<script type="text/javascript" src="~/js/signalr-client-1.0.0-alpha2-final.js"></script>
+
+<!--Add script to update the page and send messages.-->
+<script type="text/javascript">
+    document.addEventListener('DOMContentLoaded', function () {
+
+        var word1 = document.getElementById('Word1');
+        var word2 = document.getElementById('Word2');
+        var word3 = document.getElementById('Word3');
+        var alsoSynonyms = document.getElementById('AlsoSynonyms');
+
+
+        // Set initial focus to word1 input box.
+        word1.focus();
+
+        // Start the connection.
+        startConnection('/search', function (connection) {
+            alert(connection.connectionId);
+            // Create a function that the hub can call to broadcast messages.
+            connection.on('SendMessageToClient', function (data) {
+                //// Html encode display name and message.
+                var encodedData = data;
+                var liElement = document.createElement('li');
+                liElement.innerHTML = '<strong>' + encodedData + '</strong>';
+                document.getElementById('Results').appendChild(liElement);
+            });
+        })
+            .then(function (connection) {
+                console.log('connection started');
+                //document.getElementById('search').addEventListener('click', function (event) {
+                //    // Call the Send method on the hub.
+                //    connection.invoke('send', word1.value, word2.value, word3.value, alsoSynonyms.value);
+
+                //    // Clear text box and reset focus for next search.
+                //    word1.value = '';
+                //    word2.value = '';
+                //    word3.value = '';
+                //    word1.focus();
+                //    event.preventDefault();
+                //});
+            })
+            .catch(error => {
+                console.error(error.message);
+            });
+
+        // Starts a connection with transport fallback - if the connection cannot be started using
+        // the webSockets transport the function will fallback to the serverSentEvents transport and
+        // if this does not work it will try longPolling. If the connection cannot be started using
+        // any of the available transports the function will return a rejected Promise.
+        function startConnection(url, configureConnection) {
+            return function start(transport) {
+                console.log(`Starting connection using ${signalR.TransportType[transport]} transport`);
+                var connection = new signalR.HubConnection(url, { transport: transport });
+                
+                document.cookie = "ClientId=" + connection.connectionId;
+                if (configureConnection && typeof configureConnection === 'function') {
+                    configureConnection(connection);
+                }
+
+                
+
+                return connection.start()
+                    .then(function () {
+                        
+                        return connection;
+                    })
+                    .catch(function (error) {
+                        console.log(`Cannot start the connection use ${signalR.TransportType[transport]} transport. ${error.message}`);
+                        if (transport !== signalR.TransportType.LongPolling) {
+                            return start(transport + 1);
+                        }
+
+                        return Promise.reject(error);
+                    });
+            }(signalR.TransportType.WebSockets);
+        }
+    });
+</script>
+
+
 

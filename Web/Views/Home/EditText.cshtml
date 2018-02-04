@@ -1,0 +1,17 @@
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@using Web
+
+
+@model Web.Models.SearchViewModel
+
+@inject IHtmlLocalizer<SharedResources> SharedLocalizer
+@inject IViewLocalizer Localizer
+
+@{
+    ViewData["Title"] = SharedLocalizer["EditText"];
+}
+
+<h2>@SharedLocalizer["EditText"]</h2>
+<div>
+    asdfasdfasdfasdf
+</div>

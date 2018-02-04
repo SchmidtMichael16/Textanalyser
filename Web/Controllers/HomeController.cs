@@ -9,13 +9,18 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using Web.Models;
 using Web;
+using Data.Contexts;
+using Data.Entities;
+
 namespace Web.Controllers
 {
     public class HomeController : Controller
     {
         private readonly IStringLocalizer<SharedResources> _sharedLocalizer;
-        public HomeController(IStringLocalizer<SharedResources> sharedLocalizer)
+        private readonly TextContext textContext;
+        public HomeController(TextContext textContext, IStringLocalizer<SharedResources> sharedLocalizer)
         {
+            this.textContext = textContext;
             _sharedLocalizer = sharedLocalizer;
         }
 
@@ -54,6 +59,17 @@ namespace Web.Controllers
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
+
+        [HttpPost]
+        public void TextCreate(TextViewModel newText)
+        {
+            textContext.Add<Text>(new Text() { Title = newText.Title, Data = newText.Text});
+            int rowCount = textContext.SaveChanges();
+            Log.SeqLog.WriteNewLogMessage("Add new Text with Title {Title} - {rows} rows inserted", newText.Title, rowCount);
+
+            Redirect("/Home/Add");
+            //return View();
         }
 
         [HttpPost]

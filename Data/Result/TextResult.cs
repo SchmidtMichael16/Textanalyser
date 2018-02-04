@@ -10,33 +10,26 @@ namespace Data.Result
         public TextResult(int textID)
         {
             this.TextID = textID;
+            this.Sentences = new List<SentenceResult>();
         }
 
         public int TextID { get; set; }
 
-        public int TotalScore
+        public double TotalScore
         {
             get
             {
-                //int totalScore = 0;
+                double totalScore = 0;
 
-                //if (this.MainSentences != null)
-                //{
-                //    totalScore += this.MainSentences.Score;
-                //}
+                if (this.Sentences != null)
+                {
+                    foreach (SentenceResult sentenceResult in this.Sentences)
+                    {
+                        totalScore += sentenceResult.Score;
+                    }
+                }
 
-                //if (this.NextSentences != null)
-                //{
-                //    totalScore += this.NextSentences.Score;
-                //}
-
-                //if (this.PreviousSentences != null)
-                //{
-                //    totalScore += this.PreviousSentences.Score;
-                //}
-
-                //return totalScore;
-                return 0;
+                return totalScore;
             }
         }
 
@@ -48,5 +41,10 @@ namespace Data.Result
             set;
         }
 
+
+        public override string ToString()
+        {
+            return $"{this.TextID}  -  {this.TotalScore}";
+        }
     }
 }

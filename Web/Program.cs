@@ -34,28 +34,25 @@ namespace Web
             dbBuilder.UseSqlite("Data Source=" + config["ConnectionStrings:SQLiteTextDb"]);
             dbName = config["ConnectionStrings:SQLiteTextDb"];
             var textContext = new TextContext(dbBuilder.Options);
-           
+
             JobStorage.Current = new SQLiteStorage(config["ConnectionStrings:SQLiteHangfire"]);
-            //BackgroundJob.Enqueue(
-            //   () => Log.SeqLog.WriteNewLogMessage("Hello current time is {Time}", DateTime.Now));
 
             // Create DB with test data.
-            CreateDbWithTestData(textContext);
+            //CreateDbWithTestData(textContext);
 
-            //RecurringJob.AddOrUpdate(
-            //   () => BackgroundTasks.SplitNewTexts(textContext),
-            //   Cron.MinuteInterval(5));
+            // Split Texts after seeding.
+            //BackgroundTasks.SplitNewTexts(textContext);
 
-            //List<Text> tmpList =  GetAllTexts(textContext, "ich");
-            //List<Text> tmpList2 = GetAllTextsToProcess(textContext);
-
-            BackgroundTasks.SplitNewTexts(textContext);
-            List<string> words = new List<string>();
-            words.Add("ich");
-            words.Add("Hallo");
-            words.Add("Heute");
-
-            //BackgroundTasks.FindWorsdInTexts(textContext, words, true);
+            // Create Background Task for new texts. 
+            Task.Factory.StartNew(() =>
+            {
+                Log.SeqLog.WriteNewLogMessage("Createing background job Split new texts.");
+                //BackgroundJob.Enqueue(
+                //        () => BackgroundTasks.SplitNewTexts(config["ConnectionStrings:SQLiteTextDb"]));
+                RecurringJob.AddOrUpdate(
+                    () => BackgroundTasks.SplitNewTexts(config["ConnectionStrings:SQLiteTextDb"]),
+                    Cron.MinuteInterval(5));
+            });
 
             BuildWebHost(args).Run();
         }

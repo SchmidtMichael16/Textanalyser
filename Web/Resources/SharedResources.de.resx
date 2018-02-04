@@ -138,7 +138,16 @@
   <data name="Search also for Synonyms" xml:space="preserve">
     <value>Auch nach Synonymen suchen</value>
   </data>
+  <data name="SearchingFor" xml:space="preserve">
+    <value>Suchen nach</value>
+  </data>
+  <data name="SearchOption" xml:space="preserve">
+    <value>Synonyme suchen</value>
+  </data>
   <data name="Word" xml:space="preserve">
     <value>Wort</value>
+  </data>
+  <data name="EditText" xml:space="preserve">
+    <value>Texte verwalten</value>
   </data>
 </root>
