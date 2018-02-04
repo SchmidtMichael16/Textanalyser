@@ -147,7 +147,7 @@ namespace Web.Controllers
                             sentenceResult.CalculateResult(searchWords, searchRequest.AlsoSynonyms);
                             sentenceResult.CalculateTotalScore();
                             // textResult.Sentences.Add(sentenceResult);
-                            Console.WriteLine("hier");
+                            //Console.WriteLine("hier");
 
                             textResult.Sentences.Add(sentenceResult);
                         }

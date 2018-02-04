@@ -122,7 +122,7 @@ namespace Data.Result
 
                 // Search for similiar word in sentence.
                 foundedWords = words.Where(w => Fastenshtein.Levenshtein.Distance(w.ToLower(), searchWord.Term.ToLower()) == 1).ToList();
-                this.AddHitsToFoundedTerms(foundedWords, sentenceType, TermType.Synonym);
+                this.AddHitsToFoundedTerms(foundedWords, sentenceType, TermType.Similar);
 
                 // Search for synonyms in sentence.
                 if (alsoSynonyms)
