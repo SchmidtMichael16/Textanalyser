@@ -150,4 +150,10 @@
   <data name="EditText" xml:space="preserve">
     <value>Edit texts</value>
   </data>
+  <data name="alsoSynonyms" xml:space="preserve">
+    <value>consider synonyms</value>
+  </data>
+  <data name="LoginText" xml:space="preserve">
+    <value>You can log  in with your google account.</value>
+  </data>
 </root>

@@ -35,8 +35,9 @@ namespace Web.Controllers
         {
             if (!User.Identity.IsAuthenticated)
             {
-                Redirect("/Account/Login");
+               return Redirect("/Account/Login");
             }
+
             ViewData["Message"] = "Add";
 
             return View();
@@ -44,13 +45,22 @@ namespace Web.Controllers
 
         public IActionResult Edit()
         {
-            ViewData["Message"] = "Edit";
+            if (!User.Identity.IsAuthenticated)
+            {
+                return Redirect("/Account/Login");
+            }
 
+            ViewData["Message"] = "Edit";
             return View();
         }
 
         public IActionResult Delete()
         {
+            if (!User.Identity.IsAuthenticated)
+            {
+                return Redirect("/Account/Login");
+            }
+
             ViewData["Message"] = "Delete";
 
             return View();
@@ -62,14 +72,13 @@ namespace Web.Controllers
         }
 
         [HttpPost]
-        public void TextCreate(TextViewModel newText)
+        public IActionResult TextCreate(TextViewModel newText)
         {
             textContext.Add<Text>(new Text() { Title = newText.Title, Data = newText.Text});
             int rowCount = textContext.SaveChanges();
             Log.SeqLog.WriteNewLogMessage("Add new Text with Title {Title} - {rows} rows inserted", newText.Title, rowCount);
 
-            Redirect("/Home/Add");
-            //return View();
+            return Redirect ("/Home/Add");
         }
 
         [HttpPost]

@@ -88,18 +88,18 @@ namespace Web.Controllers
             List<TextResult> result = new List<TextResult>();  //BackgroundTasks.FindWorsdInTexts(this.textContext, searchwords, alsoSynonyms);
 
             this._hubContext.Clients.All.InvokeAsync("SendMessageToClient", this._sharedLocalizer["SearchingFor"] + ": || " + word1 + " - " + word2 + " - " + word3 + " || " + this._sharedLocalizer["SearchOption"] + " = " + alsoSynonyms);
-            //((SearchHub)this._hubContext).Send(this._sharedLocalizer["SearchingFor"] + ": || " + word1 + " - " + word2 + " - " + word3 + " || " + this._sharedLocalizer["SearchOption"] + " = " + alsoSynonyms);
-            //Task.Factory.StartNew(() =>
-            //{
-            //    Log.SeqLog.WriteNewLogMessage("Createing background search jobfor {searchword1}  {searchword2}  {searchword3}  also Synonyms: {alsoSynonyms}", searchRequest.SearchWord1, searchRequest.SearchWord2, searchRequest.SearchWord3, searchRequest.AlsoSynonyms);
-            //    BackgroundJob.Enqueue(
-            //           () => this.FindWorsdInTexts( searchRequest));
+            
+            Task.Factory.StartNew(() =>
+            {
+                Log.SeqLog.WriteNewLogMessage("Createing background search jobfor {searchword1}  {searchword2}  {searchword3}  also Synonyms: {alsoSynonyms}", searchRequest.SearchWord1, searchRequest.SearchWord2, searchRequest.SearchWord3, searchRequest.AlsoSynonyms);
+                BackgroundJob.Enqueue(
+                       () => this.FindWorsdInTexts(searchRequest));
 
-            //    //BackgroundJob.Enqueue(
-            //    //    () => Log.SeqLog.WriteNewLogMessage("This should be a SearchJob {Time}", DateTime.Now));
-            //});
+                //BackgroundJob.Enqueue(
+                //    () => Log.SeqLog.WriteNewLogMessage("This should be a SearchJob {Time}", DateTime.Now));
+            });
 
-            this.FindWorsdInTexts(searchRequest);
+            //this.FindWorsdInTexts(searchRequest);
 
             
             //return new ObjectResult(result);

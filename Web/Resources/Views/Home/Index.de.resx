@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="Description" xml:space="preserve">
-    <value>Hier können Sie neue Texte hochladen oder bestehende Texte bearbeiten/löschen.</value>
+    <value>Hier können Sie alle Texte nach bestimmten Wortern durchsuchen. Es können maximal 3 Wörter gesucht werden. Außerdem können Sie auch Synonyme berücksichtigen.</value>
   </data>
   <data name="Headline" xml:space="preserve">
     <value>Willkommen beim Textanalyser</value>

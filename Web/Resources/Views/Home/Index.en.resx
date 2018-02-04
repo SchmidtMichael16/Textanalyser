@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="Description" xml:space="preserve">
-    <value>Here you can upload new texts or modify/delete existing texts.</value>
+    <value>Here you can search for words in stored texts.</value>
   </data>
   <data name="Headline" xml:space="preserve">
     <value>Welcome to the Textanalyser!</value>

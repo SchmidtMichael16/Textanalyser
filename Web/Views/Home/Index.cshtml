@@ -15,7 +15,6 @@
 <div>
     @Localizer["Description"]
 </div>
-<div>@SharedLocalizer["Add"] - Hier sollte es gehen</div>
 <br />
 
 <hr />
@@ -41,7 +40,7 @@
             <div class="form-group">
                 <div class="checkbox">
                     <label>
-                        <input asp-for="AlsoSynonyms" /> @Localizer["alsoSynonyms"]
+                        <input asp-for="AlsoSynonyms" /> @SharedLocalizer["alsoSynonyms"]
                     </label>
                 </div>
             </div>
@@ -75,7 +74,6 @@
 
         // Start the connection.
         startConnection('/search', function (connection) {
-            alert(connection.connectionId);
             // Create a function that the hub can call to broadcast messages.
             connection.on('SendMessageToClient', function (data) {
                 //// Html encode display name and message.

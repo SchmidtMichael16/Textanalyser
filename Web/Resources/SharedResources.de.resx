@@ -150,4 +150,10 @@
   <data name="EditText" xml:space="preserve">
     <value>Texte verwalten</value>
   </data>
+  <data name="alsoSynonyms" xml:space="preserve">
+    <value>Synonyme berücksichtigen</value>
+  </data>
+  <data name="LoginText" xml:space="preserve">
+    <value>Sie können sich mit Ihrem Google Account anmelden.</value>
+  </data>
 </root>
